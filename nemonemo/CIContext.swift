@@ -8,7 +8,9 @@
 import Foundation
 import UIKit
 
-func getCIImageContext(imageName: String, unitSize: Int) -> [(UUID, UIColor)] {
+func getCIImageContext(imageName: String, unitSize: Int) -> [[ColorData]] {
+
+	
 	var image = UIImage(named: imageName)
 	
 	if image != nil {
@@ -22,9 +24,10 @@ func getCIImageContext(imageName: String, unitSize: Int) -> [(UUID, UIColor)] {
 	
 	let rectSize = CGSize(width: unitSize, height: unitSize)
 	
-	var averageColorsWithUUID: [(UUID, UIColor)] = []
-	
+	var colorsRow: [[ColorData]] = []
 	for y in stride(from: 0, to: imageHeight, by: Int.Stride(rectSize.height)) {
+		var averageColorsWithUUID: [ColorData] = []
+		
 		for x in stride(from: 0, to: imageWidth, by: Int.Stride(rectSize.width)) {
 			let rect = CGRect(x: x, y: y, width: Int(rectSize.width), height: Int(rectSize.height))
 			
@@ -38,11 +41,13 @@ func getCIImageContext(imageName: String, unitSize: Int) -> [(UUID, UIColor)] {
 				fatalError("영역 내 주 색상값 계산 실패")
 			}
 			
-			var uuid = UUID()
-			averageColorsWithUUID.append((uuid, averageColor))
+			let colorId = UUID()
+			let colorData = ColorData(id: colorId, color: averageColor)
+			averageColorsWithUUID.append(colorData)
 		}
+		colorsRow.append(averageColorsWithUUID)
 	}
-	return averageColorsWithUUID
+	return colorsRow
 }
 
 extension UIImage {
