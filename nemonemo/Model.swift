@@ -5,14 +5,12 @@
 //  Created by Jiwoon Lee on 2/5/24.
 //
 
-import UIKit
 import Foundation
+import UIKit
 
 struct ColorData {
 	var id: UUID
 	var color: UIColor
-	
-	
 }
 
 
