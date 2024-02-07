@@ -38,7 +38,7 @@ func getCIImageContext(imageName: String, unitSize: Int) -> [[ColorData]] {
 			let croppedUIArea = UIImage(cgImage: croppedCGArea)
 			
 			guard let averageColor = croppedUIArea.averageColor else {
-				fatalError("영역 내 주 색상값 계산 실패")
+				fatalError("영역 내 평균 색상값 계산 실패")
 			}
 			
 			let colorId = UUID()
