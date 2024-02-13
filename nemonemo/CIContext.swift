@@ -11,6 +11,14 @@ import UIKit
 func getCIImageContext(imageName: String, unitSize: Double) -> [[ColorData]] {
 	var image = UIImage(named: imageName)
 	
+	func pixelateImage() {
+		guard let image = image else {
+			print("currentImage nil")
+			return
+		}
+		colorsRow = getCIImageContext(imageName: imageName, unitSize: unitSize)
+	}
+	
 	if image != nil {
 		print("image exists")
 	} else {

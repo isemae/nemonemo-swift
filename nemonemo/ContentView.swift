@@ -13,21 +13,58 @@ struct ContentView: View {
 	@State private var isEditing = false
 	@State private var isEmbossed = false
 	@State private var isPixeled = false
-	
+	@State private var currentImageName: String = "punchCat"
 	@State private var avgColorsRow: [[ColorData]] = []
-	var image = UIImage(named: "punchCat")
 	var body: some View {
-		ZStack {
-			Image("punchCat")
+		var image = UIImage(named: currentImageName)
+		selectImageButtons()
+		GeometryReader { geometry in
+			Image(currentImageName)
 				.resizable()
 				.scaledToFit()
-			if isPixeled && !isEditing {
-				PixelatedImageView()
-			}
+				.overlay(
+					Group {
+						if isPixeled && !isEditing {
+							PixelatedImageView()
+								.frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height)
+								.onChange(of: squareScale) {
+									DispatchQueue.global().async {
+										pixelateCurrentImage()
+									}
+								}
+								.onChange(of: currentImageName) {
+									DispatchQueue.global().async {
+										pixelateCurrentImage()
+									}
+								}
+								.onAppear() {
+									DispatchQueue.global().async {
+										pixelateCurrentImage()
+									}
+								}
+						}
+					}
+				)
+				.frame(maxWidth: geometry.size.width, maxHeight: geometry.size.height)
+				.padding()
+			
+			
 		}
-		.frame(width: image!.size.width, height: image!.size.height)
 		ImageProcessingToggles(isEmbossed: $isEmbossed, isPixeled: $isPixeled)
 		ScaleSlider(isEditing: $isEditing, squareScale: $squareScale)
+	}
+	
+	
+	func selectImageButtons() -> some View {
+		HStack {
+			ForEach(Gatos.allCases, id: \.self) { gato in
+				Button(action: { setCurrentImage(imageName: gato.gato.name ) }) {
+					Text(gato.gato.desc)
+					Image(systemName: gato.gato.symbol)
+						.foregroundColor(.accentColor)
+				}
+			}
+		}
 	}
 	
 	func PixelatedImageView() -> some View {
@@ -45,17 +82,16 @@ struct ContentView: View {
 					}
 				}
 			}
-			.onChange(of: squareScale) {
-				DispatchQueue.global().async {
-					avgColorsRow = getCIImageContext(imageName: "punchCat", unitSize: squareScale)
-				}
-			}
-			.onAppear() {
-				DispatchQueue.global().async {
-					avgColorsRow = getCIImageContext(imageName: "punchCat", unitSize: squareScale)
-				}
-			}
+			
 		}
+	}
+	
+	func pixelateCurrentImage() {
+		avgColorsRow = getCIImageContext(imageName: currentImageName, unitSize: squareScale)
+	}
+	
+	func setCurrentImage(imageName: String) {
+		currentImageName = imageName
 	}
 }
 
