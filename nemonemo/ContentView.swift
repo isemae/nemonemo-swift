@@ -54,15 +54,24 @@ struct ContentView: View {
 		ScaleSlider(isEditing: $isEditing, squareScale: $squareScale)
 	}
 	
-	
 	func selectImageButtons() -> some View {
 		HStack {
 			ForEach(Gatos.allCases, id: \.self) { gato in
-				Button(action: { setCurrentImage(imageName: gato.gato.name ) }) {
+				Spacer()
+				VStack {
 					Text(gato.gato.desc)
-					Image(systemName: gato.gato.symbol)
-						.foregroundColor(.accentColor)
+						.font(.caption)
+					Button(action: { setCurrentImage(imageName: gato.gato.name ) }) {
+						Image(systemName: gato.gato.symbol)
+							.foregroundColor(.accentColor)
+							.font(.title)
+					}
+					.frame(width: 50, height: 50)
+					.background()
+					.cornerRadius(10)
+					.shadow(radius: 5)
 				}
+				Spacer()
 			}
 		}
 	}

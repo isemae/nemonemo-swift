@@ -9,23 +9,14 @@ import Foundation
 import UIKit
 
 func getCIImageContext(imageName: String, unitSize: Double) -> [[ColorData]] {
-	var image = UIImage(named: imageName)
-	
-	func pixelateImage() {
-		guard let image = image else {
-			print("currentImage nil")
-			return
-		}
-		colorsRow = getCIImageContext(imageName: imageName, unitSize: unitSize)
+	guard let image = UIImage(named: imageName) else {
+		print("Currently no image found")
+		return []
 	}
 	
-	if image != nil {
-		print("image exists")
-	} else {
-		print("no image")
-	}
-	
-	let imageSize = image!.size
+	print("Pixelating \(imageName)")
+
+	let imageSize = image.size
 	let imageWidth = Double(imageSize.width)
 	let imageHeight = Double(imageSize.height)
 	let imageRatio = imageWidth / imageHeight
@@ -40,7 +31,7 @@ func getCIImageContext(imageName: String, unitSize: Double) -> [[ColorData]] {
 		for x in stride(from: 0, to: imageWidth, by: Double(rectSize)) {
 			let rect = CGRect(x: x, y: y, width: 10, height: 10)
 			
-			guard let croppedCGArea = image?.cgImage?.cropping(to: rect) else {
+			guard let croppedCGArea = image.cgImage?.cropping(to: rect) else {
 				fatalError("영역 크롭 실패")
 			}
 			
