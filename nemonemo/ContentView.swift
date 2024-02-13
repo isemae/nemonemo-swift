@@ -9,34 +9,71 @@ import SwiftUI
 import UIKit
 
 struct ContentView: View {
-	@State private var squareScale = 30
-	@State private var squareSize = UIScreen.main.bounds.width
+	@State private var squareScale: Double = 1.0
+	@State private var isEditing = false
+	@State private var isEmbossed = false
+	@State private var isPixeled = false
+
 	@State private var avgColorsRow: [[ColorData]] = []
-	@State private var rowColors: [ColorData] = []
-	
+	var image = UIImage(named: "punchCat")
 	var body: some View {
-		let columns = [GridItem](repeating: GridItem(.flexible(), spacing: 0), count: Int(squareScale))
-		VStack(spacing: 0) {
-			ForEach(avgColorsRow, id: \.self) { row in
-				HStack(spacing: 0) {
-					ForEach(row, id: \.id) { colorTuple in
-						ZStack {
-							Rectangle()
-								.foregroundColor(Color(colorTuple.color))
-							AngularGradient(gradient: Gradient(colors: [.secondary.opacity(0.5), .clear]), center: .center, startAngle: .degrees(-90), endAngle: .degrees(270))
+		ZStack {
+			Image("punchCat")
+				.resizable()
+				.scaledToFit()
+
+			if isPixeled && !isEditing {
+				VStack(spacing: 0) {
+					ForEach(avgColorsRow, id: \.self) { row in
+						HStack(spacing: 0) {
+							ForEach(row, id: \.id) { colorTuple in
+								ZStack {
+									Rectangle()
+										.foregroundColor(Color(colorTuple.color))
+									if isEmbossed {
+										AngularGradient(gradient: Gradient(colors: [.secondary.opacity(0.5), .clear]), center: .center, startAngle: .degrees(-90), endAngle: .degrees(270))
+									}
+								}
+							}
 						}
-						.frame(width: squareSize / CGFloat(squareScale), height: squareSize / CGFloat(squareScale))
+					}
+				}
+				.onChange(of: squareScale) {
+					DispatchQueue.global().async {
+						avgColorsRow = getCIImageContext(imageName: "punchCat", unitSize: squareScale)
+					}
+				}
+				.onAppear() {
+					DispatchQueue.global().async {
+						avgColorsRow = getCIImageContext(imageName: "punchCat", unitSize: squareScale)
 					}
 				}
 			}
 		}
-		.onAppear() {
-			avgColorsRow = getCIImageContext(imageName: "punchCat", unitSize: 20)
+		.frame(width: image!.size.width, height: image!.size.height)
+		
+		HStack {
+			Toggle(isOn: $isPixeled) {
+				Text("Pixelate")
+			}
+			Toggle(isOn: $isEmbossed) {
+				Text("Emboss")
+			}
 		}
+		ScaleSlider(isEditing: $isEditing, squareScale: $squareScale)
 	}
-	
 }
 
-#Preview {
-	ContentView()
+struct ScaleSlider: View {
+	@Binding var isEditing: Bool
+	@Binding var squareScale: Double
+	var body: some View {
+		Slider(value: $squareScale, in: 1...50, onEditingChanged: { editing in
+			isEditing = editing
+		})
+		Text("\(Int(squareScale))")
+	}
 }
+//#Preview {
+//	ContentView(isEditing: <#Binding<Bool>#>, squareScale: <#Binding<CGFloat>#>)
+//}

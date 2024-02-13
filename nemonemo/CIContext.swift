@@ -8,9 +8,7 @@
 import Foundation
 import UIKit
 
-func getCIImageContext(imageName: String, unitSize: Int) -> [[ColorData]] {
-
-	
+func getCIImageContext(imageName: String, unitSize: Double) -> [[ColorData]] {
 	var image = UIImage(named: imageName)
 	
 	if image != nil {
@@ -18,18 +16,21 @@ func getCIImageContext(imageName: String, unitSize: Int) -> [[ColorData]] {
 	} else {
 		print("no image")
 	}
-	let imageSize = image!.size
-	let imageWidth = Int(imageSize.width)
-	let imageHeight = Int(imageSize.height)
 	
-	let rectSize = CGSize(width: unitSize, height: unitSize)
+	let imageSize = image!.size
+	let imageWidth = Double(imageSize.width)
+	let imageHeight = Double(imageSize.height)
+	let imageRatio = imageWidth / imageHeight
+	let rectSize = min(imageSize.width, imageSize.height) / unitSize
+	
+//	let rectSize = CGSize(width: imageWidth / unitSize, height: imageWidth / unitSize)
 	
 	var colorsRow: [[ColorData]] = []
-	for y in stride(from: 0, to: imageHeight, by: Int.Stride(rectSize.height)) {
+	for y in stride(from: 0, to: imageHeight, by: Double(rectSize)) {
 		var averageColorsWithUUID: [ColorData] = []
 		
-		for x in stride(from: 0, to: imageWidth, by: Int.Stride(rectSize.width)) {
-			let rect = CGRect(x: x, y: y, width: Int(rectSize.width), height: Int(rectSize.height))
+		for x in stride(from: 0, to: imageWidth, by: Double(rectSize)) {
+			let rect = CGRect(x: x, y: y, width: 10, height: 10)
 			
 			guard let croppedCGArea = image?.cgImage?.cropping(to: rect) else {
 				fatalError("영역 크롭 실패")
